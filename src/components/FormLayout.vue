@@ -1,12 +1,12 @@
 <template>
   <v-card class="mx-auto px-6 pt-8 pb-6 card-form" max-width="450px">
-    <v-form ref="form" lazy-validation>
+    <v-form ref="form">
       <div class="text-center">
         <h3 class="form-header">Please fill out this form</h3>
       </div>
-      <v-text-field v-model="formData.name" label="Name" class="custom-text-field" variant="solo" required></v-text-field>
+      <v-text-field v-model="formData.name" label="Name" class="custom-text-field" variant="solo"></v-text-field>
       <v-text-field v-model="formData.surname" label="Surname" class="custom-text-field" variant="solo"></v-text-field>
-      <v-text-field v-model="formData.email" label="Email" :rules="emailRules" required class="custom-text-field"
+      <v-text-field v-model="formData.email" label="Email" type="text" :rules="emailRules" class="custom-text-field"
         variant="solo"></v-text-field>
       <v-text-field v-model="formData.age" @keypress="filterNumbers(event)" label="Age" type="text" :rules="ageRules"
         class="custom-text-field" variant="solo"></v-text-field>
@@ -14,19 +14,19 @@
         variant="solo" hide-details>
       </v-select>
 
-      <v-container class="pa-2 ">
+      <v-container class="pa-2">
         <h5 class="contact-preference-label">Choose contact preference</h5>
         <v-row>
           <v-col cols="4" class="pa-0">
-            <v-checkbox v-model="formData.contactPreference" :rules="contactPreferenceRule" label="by email" value="Email"
-              color="blue-lighten-3" class="contact-preference-details"></v-checkbox>
+            <v-checkbox v-model="formData.contactPreference" :rules="[contactPreferenceRule]" label="by email"
+              value="Email" color="blue-lighten-3" class="contact-preference-details"></v-checkbox>
           </v-col>
           <v-col cols="4" class="pa-0">
-            <v-checkbox v-model="formData.contactPreference" :rules="contactPreferenceRule" label="by phone call"
+            <v-checkbox v-model="formData.contactPreference" :rules="[contactPreferenceRule]" label="by phone call"
               value="Phone Call" color="blue-lighten-3" class="contact-preference" hide-details></v-checkbox>
           </v-col>
           <v-col cols="4" class="pa-0">
-            <v-checkbox v-model="formData.contactPreference" :rules="contactPreferenceRule" label="via SMS"
+            <v-checkbox v-model="formData.contactPreference" :rules="[contactPreferenceRule]" label="via SMS"
               value="via SMS" color="blue-lighten-3" class="contact-preference" hide-details></v-checkbox>
           </v-col>
         </v-row>
@@ -35,7 +35,6 @@
       <v-container class="d-flex justify-center pt-0">
         <v-btn class="me-4 submit-button mt-3" @click="submitForm">Submit</v-btn>
       </v-container>
-
     </v-form>
   </v-card>
 </template>
@@ -54,26 +53,21 @@ export default {
         contactPreference: [],
       },
       colorOptions: ["Red", "Green", "Blue", "White", "Black"],
+      emailRules: [(v) => /.+@.+\..+/.test(v) || "Email must be a valid email address"],
+      ageRules: [(v) => v < 120 || "Age must be less than 120"],
     };
   },
   computed: {
-    emailRules() {
-      return [
-        (v) => /.+@.+\..+/.test(v) || "Email must be a valid email address",
-      ];
-    },
-    ageRules() {
-      return [
-        (v) => /^\d+$/.test(v) || "Age must be a number",
-        (v) => v < 120 || "Age must be less than 120",
-      ];
-    },
     contactPreferenceRule() {
-      return [(v) => v.length > 0 || "Please select at least one contact preference"];
+      return () =>
+        this.formData.contactPreference?.length > 0 ||
+        "Please select at least one contact preference.";
     },
 
   },
   methods: {
+
+
     //make input only numbers
     filterNumbers(evt) {
       evt = evt ? evt : window.event;
@@ -87,21 +81,27 @@ export default {
 
     submitForm() {
       if (this.$refs.form.validate()) {
-        if (this.formData.name.trim() === '' || this.formData.surname.trim() === '' || this.formData.email.trim() === '' || this.formData.age.trim() === '' ||
-          this.formData.contactPreference.length === 0) {
+        if (
+          this.formData.name.trim() === "" ||
+          this.formData.surname.trim() === ""
+        ) {
           return;
         }
+        this.$emit("form-submitted", this.formData);
 
-        this.$emit('form-submitted', this.formData);
+        this.$nextTick(() => {
+          this.formData = {
+            name: "",
+            surname: "",
+            email: "",
+            age: "",
+            favoriteColor: "",
+            contactPreference: [""],
+          };
+        });
 
-        this.formData = {
-          name: "",
-          surname: "",
-          email: "",
-          age: "",
-          favoriteColor: "",
-          contactPreference: [],
-        };
+        this.$refs.form.resetValidation()
+
       }
     },
   },
