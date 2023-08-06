@@ -53,8 +53,15 @@ export default {
         contactPreference: [],
       },
       colorOptions: ["Red", "Green", "Blue", "White", "Black"],
-      emailRules: [(v) => /.+@.+\..+/.test(v) || "Email must be a valid email address"],
-      ageRules: [(v) => v < 120 || "Age must be less than 120"],
+
+      emailRules: [
+        (v) => /.+@.+\..+/.test(v) || "Email must be a valid email address",
+        (v) => !!v || "Email is required",
+      ],
+      ageRules: [
+        (v) => v >= 0 && v < 120 || "Age must be a valid number between 0 and 120",
+        (v) => !!v || "Age is required",
+      ],
     };
   },
   computed: {
@@ -79,15 +86,28 @@ export default {
       }
     },
 
-    submitForm() {
-      if (this.$refs.form.validate()) {
+    async submitForm() {
+
+      const isValid = await this.$refs.form.validate();
+      console.log("valid", isValid.valid);
+      if (isValid.valid) {
+        console.log("first")
         if (
           this.formData.name.trim() === "" ||
-          this.formData.surname.trim() === ""
+          this.formData.surname.trim() === "" ||
+          !this.formData.email ||
+          !this.formData.age
         ) {
+          console.log("second")
           return;
         }
+
+        // Form is valid and required fields are filled, proceed with form submission
+        console.log("Form submitted successfully");
+
         this.$emit("form-submitted", this.formData);
+
+        this.$refs.form.resetValidation();
 
         this.$nextTick(() => {
           this.formData = {
@@ -98,14 +118,16 @@ export default {
             favoriteColor: "",
             contactPreference: [""],
           };
+          this.ageRules = [];
+          this.emailRules = [];
         });
 
-        this.$refs.form.resetValidation()
-
       }
+
     },
-  },
-};
+  }
+}
+  ;
 </script>
 
 <style>
