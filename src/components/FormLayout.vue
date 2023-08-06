@@ -64,17 +64,16 @@ export default {
       ],
     };
   },
+
   computed: {
     contactPreferenceRule() {
       return () =>
         this.formData.contactPreference?.length > 0 ||
         "Please select at least one contact preference.";
     },
-
   },
+
   methods: {
-
-
     //make input only numbers
     filterNumbers(evt) {
       evt = evt ? evt : window.event;
@@ -87,27 +86,17 @@ export default {
     },
 
     async submitForm() {
-
       const isValid = await this.$refs.form.validate();
-      console.log("valid", isValid.valid);
       if (isValid.valid) {
-        console.log("first")
         if (
           this.formData.name.trim() === "" ||
           this.formData.surname.trim() === "" ||
           !this.formData.email ||
           !this.formData.age
         ) {
-          console.log("second")
           return;
         }
-
-        // Form is valid and required fields are filled, proceed with form submission
-        console.log("Form submitted successfully");
-
         this.$emit("form-submitted", this.formData);
-
-        this.$refs.form.resetValidation();
 
         this.$nextTick(() => {
           this.formData = {
@@ -121,13 +110,10 @@ export default {
           this.ageRules = [];
           this.emailRules = [];
         });
-
       }
-
     },
   }
-}
-  ;
+};
 </script>
 
 <style>
