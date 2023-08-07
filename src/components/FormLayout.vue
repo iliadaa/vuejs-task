@@ -104,7 +104,7 @@ export default {
           email: "",
           age: "",
           favoriteColor: "",
-          contactPreference: [""],
+          contactPreference: [],
         };
 
         this.$nextTick(() => {

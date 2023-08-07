@@ -74,7 +74,7 @@ export default {
                 email: formData.email,
                 age: formData.age,
                 favoriteColor: formData.favoriteColor,
-                contactPreference: formData.contactPreference.join(", "),
+                contactPreference: formData.contactPreference.join(","),
             };
             this.formDataTable.push(newRow);
 
