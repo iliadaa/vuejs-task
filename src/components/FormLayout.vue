@@ -98,18 +98,19 @@ export default {
         }
         this.$emit("form-submitted", this.formData);
 
+        this.formData = {
+          name: "",
+          surname: "",
+          email: "",
+          age: "",
+          favoriteColor: "",
+          contactPreference: [""],
+        };
+
         this.$nextTick(() => {
-          this.formData = {
-            name: "",
-            surname: "",
-            email: "",
-            age: "",
-            favoriteColor: "",
-            contactPreference: [""],
-          };
-          this.ageRules = [];
-          this.emailRules = [];
+          this.$refs.form.resetValidation();
         });
+
       }
     },
   }
